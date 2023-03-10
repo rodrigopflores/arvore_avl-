@@ -5,6 +5,8 @@ import lombok.Data;
 
 import java.util.Objects;
 
+import static java.util.Objects.*;
+
 @Data
 public class Node {
     private Integer key;
@@ -15,8 +17,44 @@ public class Node {
         this.key = key;
     }
 
+    public void insertChild(Node node) {
+        if (node.isGreaterThan(this)) {
+            right = node;
+        } else {
+            left = node;
+        }
+    }
+
+    public Node removeChild(Node node) {
+        Node removed = null;
+        if (node.equals(left)) {
+            removed = left;
+            left = null;
+        } else if (node.equals(right)) {
+            removed = right;
+            right = null;
+        }
+        return removed;
+    }
+
     public boolean isGreaterThan(Node node) {
         return key.compareTo(node.getKey()) > 0;
+    }
+
+    public boolean hasChild(Node node) {
+        return node.equals(left) || node.equals(right);
+    }
+
+    public boolean isLeaf() {
+        return isNull(left) && isNull(right);
+    }
+
+    public boolean hasSingleChild() {
+        return Boolean.logicalXor(isNull(left), isNull(right));
+    }
+
+    public Node getSingleChild() {
+        return nonNull(left) ? left : right;
     }
 
     public boolean contains(Integer key) {
@@ -33,6 +71,6 @@ public class Node {
 
     @Override
     public int hashCode() {
-        return Objects.hash(key);
+        return hash(key);
     }
 }
