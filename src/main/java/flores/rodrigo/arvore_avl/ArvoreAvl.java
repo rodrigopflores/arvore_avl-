@@ -54,30 +54,32 @@ public class ArvoreAvl {
         if (isNull(parent.getRight()))
             parent.setRight(newNode);
         else
-            insertAsChildNode(parent, newNode);
+            insertAsChildNode(parent.getRight(), newNode);
     }
 
     private void insertAsLeftChild(Node parent, Node newNode) {
         if (isNull(parent.getLeft()))
             parent.setLeft(newNode);
         else
-            insertAsChildNode(parent, newNode);
+            insertAsChildNode(parent.getLeft(), newNode);
     }
 
-    public Node removeNode(Integer key) {
+    public void removeNode(Integer key) {
         Node node = findNode(key);
         if (isNull(node)) {
-            return null;
+            return;
         }
-        return removeNode(node);
+       removeNode(node);
 
     }
 
-    private Node removeNode(Node node) {
+    private void removeNode(Node node) {
         if (node.isLeaf()) {
-            return removeLeaf(node);
+            removeLeaf(node);
         } else if (node.hasSingleChild()) {
-            return removeParentOfOne(node);
+            removeParentOfOne(node);
+        } else {
+            removeByCopy(node);
         }
     }
 
@@ -92,13 +94,68 @@ public class ArvoreAvl {
         parent.removeChild(node);
     }
 
-    private Node removeParentOfToo(Node node) {
+    private void removeByCopy(Node node) {
         Node leftChild = node.getLeft();
-        Node largestOnTheLeft = getLargestOnSubtree(node.getLeft());
+        Node rightChild = node.getRight();
+        Node largestOnTheLeft = getLargestOnSubtree(leftChild);
+        removeNode(largestOnTheLeft);
+        Node parent = findParent(node);
+        parent.insertChild(largestOnTheLeft);
+        largestOnTheLeft.insertChildren(leftChild, rightChild);
+        largestOnTheLeft.removeChild(largestOnTheLeft); // in case the largest on the left was the one on the left.
     }
 
     private Node getLargestOnSubtree(Node node) {
         Node rightNode = node.getRight();
-        return isNull(rightNode) ? node : rightNode;
+        return isNull(rightNode) ? node : getLargestOnSubtree(rightNode);
+    }
+
+    public void printTree() {
+        if (isNull(root)) {
+            System.out.println("the tree is empty");
+        } else {
+        printNode(root, "");
+
+        }
+
+    }
+
+    private void printNode(Node node, String prefix) {
+        if (node == null) {
+            return;
+        }
+
+        System.out.println(prefix + "─ " + node.getKey());
+
+        if (node.getLeft() != null || node.getRight() != null) {
+            if (node.getLeft() != null) {
+                printNode(node.getLeft(), prefix + "    └── ");
+            }
+
+            if (node.getRight() != null) {
+                printNode(node.getRight(), prefix + "    ├── ");
+            }
+        }
+
+//        if (nonNull(node.getRight())) {
+//            printNode(node.getRight(), degree + 1);
+//            for (int i = 0; i < degree; i++)
+//                System.out.print(" ");
+//        }
+//        for (int i = 0; i < degree; i++)
+//            System.out.print("   ");
+//        System.out.println(node.getKey());
+//        if (nonNull(node.getLeft())) {
+//            for (int i = 0; i < degree; i++)
+//                System.out.print("   ");
+//            System.out.println(" \\");
+//            printNode(node.getLeft(), degree + 1);
+//        }
+
+//        System.out.println(currentPath + "-" + node.getKey());
+//        if (nonNull(node.getLeft()))
+//        printNode(node.getLeft(), currentPath + " |");
+//        if (nonNull(node.getRight()))
+//        printNode(node.getRight(), currentPath + "  ");
     }
 }

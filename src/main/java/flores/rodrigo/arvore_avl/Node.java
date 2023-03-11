@@ -1,9 +1,6 @@
 package flores.rodrigo.arvore_avl;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.util.Objects;
 
 import static java.util.Objects.*;
 
@@ -25,6 +22,11 @@ public class Node {
         }
     }
 
+    public void insertChildren(Node left, Node right) {
+        this.left = left;
+        this.right = right;
+    }
+
     public Node removeChild(Node node) {
         Node removed = null;
         if (node.equals(left)) {
@@ -35,6 +37,11 @@ public class Node {
             right = null;
         }
         return removed;
+    }
+
+    public void removeChildren() {
+        left = null;
+        right = null;
     }
 
     public boolean isGreaterThan(Node node) {
