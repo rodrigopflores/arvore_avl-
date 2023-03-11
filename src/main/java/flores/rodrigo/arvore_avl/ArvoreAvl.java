@@ -2,6 +2,8 @@ package flores.rodrigo.arvore_avl;
 
 import lombok.Data;
 
+import java.util.Optional;
+
 import static java.util.Objects.*;
 
 @Data
@@ -41,6 +43,9 @@ public class ArvoreAvl {
             root = newNode;
         else
             insertAsChildNode(root, newNode);
+        printTree();
+        ballanceTree();
+        printTree();
     }
 
     private void insertAsChildNode(Node parent, Node newNode) {
@@ -69,8 +74,7 @@ public class ArvoreAvl {
         if (isNull(node)) {
             return;
         }
-       removeNode(node);
-
+        removeNode(node);
     }
 
     private void removeNode(Node node) {
@@ -111,9 +115,11 @@ public class ArvoreAvl {
     }
 
     public void printTree() {
+        System.out.println("================");
         if (isNull(root)) {
             System.out.println("the tree is empty");
         } else {
+            System.out.println(root.getKey());
         printNode(root, "");
 
         }
@@ -125,37 +131,120 @@ public class ArvoreAvl {
             return;
         }
 
-        System.out.println(prefix + "─ " + node.getKey());
 
-        if (node.getLeft() != null || node.getRight() != null) {
-            if (node.getLeft() != null) {
-                printNode(node.getLeft(), prefix + "    └── ");
-            }
+        Node left = node.getLeft();
+        Node right = node.getRight();
+        if (left != null && right != null) {
+                System.out.println(prefix + "├── "+ left.getKey());
+                printNode(left, prefix + "│    ");
 
-            if (node.getRight() != null) {
-                printNode(node.getRight(), prefix + "    ├── ");
-            }
+                System.out.println(prefix + "└── "+ right.getKey());
+
+                printNode(right, prefix + "    ");
+        }else if (nonNull(left))  {
+            System.out.println(prefix + "└── "+ left.getKey() );
+            printNode(left, prefix + "    ");
+
+        }else if (nonNull(right)) {
+            System.out.println(prefix + "└── "+ right.getKey());
+
+            printNode(right, prefix + "    ");
+
         }
 
-//        if (nonNull(node.getRight())) {
-//            printNode(node.getRight(), degree + 1);
-//            for (int i = 0; i < degree; i++)
-//                System.out.print(" ");
-//        }
-//        for (int i = 0; i < degree; i++)
-//            System.out.print("   ");
-//        System.out.println(node.getKey());
-//        if (nonNull(node.getLeft())) {
-//            for (int i = 0; i < degree; i++)
-//                System.out.print("   ");
-//            System.out.println(" \\");
-//            printNode(node.getLeft(), degree + 1);
-//        }
-
-//        System.out.println(currentPath + "-" + node.getKey());
-//        if (nonNull(node.getLeft()))
-//        printNode(node.getLeft(), currentPath + " |");
-//        if (nonNull(node.getRight()))
-//        printNode(node.getRight(), currentPath + "  ");
     }
+
+    public  void ballanceTree() {
+        System.out.println("balancing node");
+
+        balanceNode(root);
+    }
+
+    private Integer balanceNode(Node node) {
+        if (isNull(node)) {
+            return 0;
+        }
+        Integer leftBF = balanceNode(node.getLeft());
+        Integer rightBF = balanceNode(node.getRight());
+        Integer balanceFactor = getSubtreeHeight(node.getLeft()) - getSubtreeHeight(node.getRight());
+        if (balanceFactor > 1) {
+            rotateToTheRight(node, leftBF);
+        }
+        if (balanceFactor < -1) {
+            rotateToTheLeft(node, rightBF);
+        } else {
+            return balanceFactor;
+        }
+        return getSubtreeHeight(node.getLeft()) - getSubtreeHeight(node.getRight());
+
+    }
+
+    private void rotateToTheLeft(Node node, Integer rightBF) {
+        if (rightBF < 0) {
+            simpleLeftRotation(node);
+        } else {
+            doubleLeftRotation(node);
+        }
+    }
+
+    private void doubleLeftRotation(Node node) {
+        simpleRightRotation(node.getRight());
+        simpleLeftRotation(node);
+    }
+
+    private void simpleLeftRotation(Node node) {
+        if (node ==null) return;
+        Node parent = findParent(node);
+        Node rightChild = node.getRight();
+        if (isNull(parent)) {
+            root = rightChild;
+        } else if (parent.getKey() > node.getKey())  {
+
+            parent.setLeft(rightChild);
+        } else {
+            parent.setRight(rightChild);
+        }
+        node.setRight(rightChild.getLeft());
+        rightChild.setLeft(node);
+    }
+
+    private void rotateToTheRight(Node node, Integer leftBF) {
+        if (leftBF > 0) {
+            simpleRightRotation(node);
+        } else {
+            doubleRightRotation(node);
+        }
+    }
+
+    private void doubleRightRotation(Node node) {
+        simpleLeftRotation(node.getLeft());
+        simpleRightRotation(node);
+    }
+
+    private void simpleRightRotation(Node node) {
+        if (node ==null) return;
+        Node parent = findParent(node);
+        Node leftChild = node.getLeft();
+        if (isNull(parent)) {
+            root = leftChild;
+        } else if (parent.getKey() > node.getKey())  {
+
+            parent.setLeft(leftChild);
+        } else {
+            parent.setRight(leftChild);
+        }
+        node.setLeft(leftChild.getRight());
+        leftChild.setRight(node);
+    }
+
+    private Integer getSubtreeHeight(Node node) {
+        if (isNull(node)) {
+            return 0;
+        }
+        return Math.max(getSubtreeHeight(node.getLeft()), getSubtreeHeight(node.getRight())) + 1;
+//        Integer left = isNull(node.getLeft()) ? 0 : getSubtreeHeight(node.getLeft());
+//        Integer right = isNull(node.getRight()) ? 0 : getSubtreeHeight(node.getRight());
+//        return Math.max(left, right) + 1;
+    }
+
 }
