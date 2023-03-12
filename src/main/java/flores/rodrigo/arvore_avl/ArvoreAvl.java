@@ -75,6 +75,9 @@ public class ArvoreAvl {
             return;
         }
         removeNode(node);
+        printTree();
+        ballanceTree();
+        printTree();
     }
 
     private void removeNode(Node node) {
@@ -104,7 +107,12 @@ public class ArvoreAvl {
         Node largestOnTheLeft = getLargestOnSubtree(leftChild);
         removeNode(largestOnTheLeft);
         Node parent = findParent(node);
+        if (isNull(parent)) {
+            root = largestOnTheLeft;
+        } else {
+
         parent.insertChild(largestOnTheLeft);
+        }
         largestOnTheLeft.insertChildren(leftChild, rightChild);
         largestOnTheLeft.removeChild(largestOnTheLeft); // in case the largest on the left was the one on the left.
     }
@@ -135,18 +143,18 @@ public class ArvoreAvl {
         Node left = node.getLeft();
         Node right = node.getRight();
         if (left != null && right != null) {
-                System.out.println(prefix + "├── "+ left.getKey());
-                printNode(left, prefix + "│    ");
+                System.out.println(prefix + "├──L:"+ left.getKey());
+                printNode(left, prefix + "│   ");
 
-                System.out.println(prefix + "└── "+ right.getKey());
+                System.out.println(prefix + "└──R:"+ right.getKey());
 
                 printNode(right, prefix + "    ");
         }else if (nonNull(left))  {
-            System.out.println(prefix + "└── "+ left.getKey() );
+            System.out.println(prefix + "└──L:"+ left.getKey() );
             printNode(left, prefix + "    ");
 
         }else if (nonNull(right)) {
-            System.out.println(prefix + "└── "+ right.getKey());
+            System.out.println(prefix + "└──R:"+ right.getKey());
 
             printNode(right, prefix + "    ");
 
