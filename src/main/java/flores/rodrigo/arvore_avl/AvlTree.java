@@ -2,12 +2,10 @@ package flores.rodrigo.arvore_avl;
 
 import lombok.Data;
 
-import java.util.Optional;
-
 import static java.util.Objects.*;
 
 @Data
-public class ArvoreAvl {
+public class AvlTree {
     private Node root;
 
     public Node findNode(Integer key) {
@@ -36,16 +34,17 @@ public class ArvoreAvl {
     }
 
     public void insertNode(Integer newKey) {
-        requireNonNull(newKey);
         Node newNode = new Node(newKey);
-
+        if (findNode(newKey) != null) {
+            System.out.println("Valor já inserido");
+            return;
+        };
         if (isNull(root))
             root = newNode;
         else
             insertAsChildNode(root, newNode);
         printTree();
-        ballanceTree();
-        printTree();
+        balanceTree();
     }
 
     private void insertAsChildNode(Node parent, Node newNode) {
@@ -76,8 +75,7 @@ public class ArvoreAvl {
         }
         removeNode(node);
         printTree();
-        ballanceTree();
-        printTree();
+        balanceTree();
     }
 
     private void removeNode(Node node) {
@@ -123,13 +121,13 @@ public class ArvoreAvl {
     }
 
     public void printTree() {
-        System.out.println("================");
+        System.out.println("\nÁrvore:");
         if (isNull(root)) {
-            System.out.println("the tree is empty");
+            System.out.println("A árvore está vazia\n");
         } else {
-            System.out.println(root.getKey());
+            System.out.println("RT:" +root.getKey());
         printNode(root, "");
-
+            System.out.println();
         }
 
     }
@@ -162,9 +160,7 @@ public class ArvoreAvl {
 
     }
 
-    public  void ballanceTree() {
-        System.out.println("balancing node");
-
+    public  void balanceTree() {
         balanceNode(root);
     }
 
@@ -177,9 +173,13 @@ public class ArvoreAvl {
         Integer balanceFactor = getSubtreeHeight(node.getLeft()) - getSubtreeHeight(node.getRight());
         if (balanceFactor > 1) {
             rotateToTheRight(node, leftBF);
+            System.out.println("Nova configuração");
+            printTree();
         }
         if (balanceFactor < -1) {
             rotateToTheLeft(node, rightBF);
+            System.out.println("Nova configuração");
+            printTree();
         } else {
             return balanceFactor;
         }
@@ -189,8 +189,10 @@ public class ArvoreAvl {
 
     private void rotateToTheLeft(Node node, Integer rightBF) {
         if (rightBF < 0) {
+            System.out.println("Nó " + node.getKey() + " desbalanceado, fazendo uma rotação simples à esquerda.");
             simpleLeftRotation(node);
         } else {
+            System.out.println("Nó " + node.getKey() + " desbalanceado, fazendo uma rotação dupla à esquerda.");
             doubleLeftRotation(node);
         }
     }
@@ -218,8 +220,10 @@ public class ArvoreAvl {
 
     private void rotateToTheRight(Node node, Integer leftBF) {
         if (leftBF > 0) {
+            System.out.println("Nó " + node.getKey() + " desbalanceado, fazendo uma rotação simples à direita.");
             simpleRightRotation(node);
         } else {
+            System.out.println("Nó " + node.getKey() + " desbalanceado, fazendo uma rotação dupla à esquerda.");
             doubleRightRotation(node);
         }
     }
